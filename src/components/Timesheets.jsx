@@ -99,8 +99,8 @@ setWeekDays(generateWeekDays(defaultWeek.start));
     });
 
     const submitted = [];
-    if (prevStatus === 'SUBMITTED') submitted.push(weeks[0]);
-    if (currStatus === 'SUBMITTED') submitted.push(weeks[1]);
+    if (prevStatus !== "NOT_SUBMITTED") submitted.push(weeks[0]);
+    if (currStatus !== "NOT_SUBMITTED") submitted.push(weeks[1]);
 
     console.log('Setting submitted weeks:', submitted);
     setSubmittedWeeks(submitted);

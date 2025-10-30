@@ -168,7 +168,7 @@ const [signinSubmitted, setSigninSubmitted] = useState(false);
     };
 
     try {
-      const response = await api.post('http://localhost:8081/users/register', payload)
+      const response = await api.post('http://localhost:8080/users/register', payload)
      
 
       const data = response.data;
@@ -233,7 +233,7 @@ const validateEmail = (username) => {
   }
 
     try {
-      const response = await api.post('http://localhost:8081/users/login',signinData);
+      const response = await api.post('http://localhost:8080/users/login',signinData);
         if (response.status === 200) {
       const data = response.data;
 
@@ -249,7 +249,7 @@ const validateEmail = (username) => {
           
 
           navigate('/Dashboard');
-        }, 1500);
+        }, 1000);
       } else {
         setSigninResponse({ success: false, message: data || 'Something went wrong !' });
       }
