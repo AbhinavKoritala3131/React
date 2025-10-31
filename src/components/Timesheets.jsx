@@ -143,12 +143,30 @@ useEffect(() => {
     }
   }, [selectedWeek, weekOptions]);
 
-  // 3. Mock projects
-  useEffect(() => {
-    const mockProjects = ['Project Alpha', 'Project Beta', 'Project Gamma'];
-    setProjects(mockProjects);
-    setSelectedProject(mockProjects[0]);
-  }, []);
+  
+// 3. Fetch project names by empId (single API call)
+useEffect(() => {
+  const fetchProjects = async () => {
+    try {
+      const res = await api.get(`/projects/employee/names/${userId}`);
+      const projectNames = res.data || [];
+
+      setProjects(projectNames);
+      setSelectedProject(projectNames[0] || 'N/A');
+    } catch (err) {
+      if (err.response?.status === 204) {
+        setProjects([]);
+        setSelectedProject('');
+      } else {
+        console.error('Error fetching project names:', err);
+      }
+    }
+  };
+
+  if (userId) fetchProjects();
+}, [userId]);
+
+
 
 
   const canFillWeek = (selectedWeekLabel, dateStrToFill = null) => {
