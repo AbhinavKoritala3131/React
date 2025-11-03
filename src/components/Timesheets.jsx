@@ -91,16 +91,21 @@ setWeekDays(generateWeekDays(defaultWeek.start));
     });
     console.log('API response:', res.data);
 
-    const { previous: prevStatus, current: currStatus } = res.data;
+   const { previous, current, prevRem, currRem } = res.data;
+       const submitted = [];
+
 
     setWeekStatuses({
-      previousWeek: prevStatus || null,
-      currentWeek: currStatus || null,
+      previousWeek: previous || null,
+      currentWeek: current || null,
+      previousRemark: prevRem || "",
+      currentRemark: currRem || ""
     });
 
-    const submitted = [];
-    if (prevStatus !== "NOT_SUBMITTED") submitted.push(weeks[0]);
-    if (currStatus !== "NOT_SUBMITTED") submitted.push(weeks[1]);
+// mark only if status is not NOT_SUBMITTED or REJECTED
+    if (previous && previous !== "NOT_SUBMITTED" && previous !== "REJECTED") submitted.push(weeks[0]);
+    if (current && current !== "NOT_SUBMITTED" && current !== "REJECTED") submitted.push(weeks[1]);
+
 
     console.log('Setting submitted weeks:', submitted);
     setSubmittedWeeks(submitted);
@@ -156,7 +161,7 @@ useEffect(() => {
     } catch (err) {
       if (err.response?.status === 204) {
         setProjects([]);
-        setSelectedProject('');
+        setSelectedProject('N/A');
       } else {
         console.error('Error fetching project names:', err);
       }
@@ -387,47 +392,22 @@ const handleSendForApproval = async () => {
     setShowSuccess(true);
     setTimes({});
 
-  // ✅ Re-fetch week statuses from backend
-  const fetchWeekStatuses = async () => {
-    if (weekOptions.length === 0) return;
 
+ // Update week statuses immediately
     const previous = weekOptions[0]?.label;
     const current = weekOptions[1]?.label;
+    await fetchWeekStatuses([previous, current], userId);
 
-    try {
-      const res = await api.post('/tsManage/status-check', {
-        empId: userId,
-        weeks: [previous, current]
-      });
-
-      const { previous: prevStatus, current: currStatus } = res.data;
-      setWeekStatuses({
-        previousWeek: prevStatus || null,
-        currentWeek: currStatus || null
-      });
-
-      const submitted = [];
-      if (prevStatus === 'SUBMITTED') submitted.push(previous);
-      if (currStatus === 'SUBMITTED') submitted.push(current);
-      setSubmittedWeeks(submitted);
-
-    } catch (err) {
-      console.error('Error fetching week statuses:', err);
+    // Move to next week or show caught up message
+    const currentWeekIndex = weekOptions.findIndex(w => w.label === selectedWeek);
+    const nextWeek = weekOptions[currentWeekIndex + 1];
+    if (nextWeek && !submittedWeeks.includes(nextWeek.label)) {
+      setSelectedWeek(nextWeek.label);
     }
-  };
 
-  await fetchWeekStatuses();
+    // Hide success toast after 3s
+    setTimeout(() => setShowSuccess(false), 3000);
 
-  // Optional: Return to current week after delay
-  setTimeout(() => {
-    const currentWeek = weekOptions.find(
-      (w) => new Date() >= w.start && new Date() <= w.end
-    );
-    if (currentWeek) {
-      setSelectedWeek(currentWeek.label);
-    }
-    setShowSuccess(false);
-  }, 3000);
 } catch (err) {
   alert('Failed to submit timesheet');
   console.error(err);
@@ -467,6 +447,22 @@ const isSubmitted = submittedWeeks.includes(selectedWeek);
   return (
     <div className={styles.timesheetContainer}>
       <h2>🕒 Weekly Timesheet</h2>
+      {(weekStatuses.previousWeek === "REJECTED" && selectedWeek === weekOptions[0]?.label) && (
+  <div className={styles.rejectedBanner}>
+    ⚠️ Your previous week's timesheet was rejected.
+    <br />
+    <strong>Remark:</strong> {weekStatuses.previousRemark || "No remarks provided."}
+  </div>
+)}
+
+{(weekStatuses.currentWeek === "REJECTED" && selectedWeek === weekOptions[1]?.label) && (
+  <div className={styles.rejectedBanner}>
+    ⚠️ Your current week's timesheet was rejected.
+    <br />
+    <strong>Remark:</strong> {weekStatuses.currentRemark || "No remarks provided."}
+  </div>
+)}
+
       
 {hasUnsavedData && !isSubmitted && (
   <div className={styles.reminderBanner}>
@@ -517,19 +513,25 @@ const isSubmitted = submittedWeeks.includes(selectedWeek);
   </div>
 ) : (
   <>
-    <div className={styles.projectDropdown}>
-      <label>Select Project:</label>
-      <select style={{ color: 'white' }}
-        value={selectedProject}
-        onChange={(e) => setSelectedProject(e.target.value)}
-      >
-        {projects.map((proj) => (
+<div className={styles.projectDropdown}>
+  <label>Select Project:</label>
+  <select
+    style={{ color: 'white' }}
+    value={selectedProject}
+    onChange={(e) => setSelectedProject(e.target.value)}
+  >
+    {projects.length > 0
+      ? projects.map((proj) => (
           <option key={proj} value={proj}>
             {proj}
           </option>
-        ))}
-      </select>
-    </div>
+        ))
+      : <option value="N/A">N/A</option>
+    }
+  </select>
+</div>
+
+
 
     <div className={styles.timesheetTable}>
       <table>

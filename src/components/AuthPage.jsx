@@ -323,14 +323,12 @@ const hasRegisterErrors = registerSubmitted && Object.keys(formErrors).length > 
     }
   </div>
   
-  <nav className={styles.headerNav}>
-    <ul>
-      <li><Link to="/home">Home</Link></li>
-      <li><Link to="/about-us">About Us</Link></li>
-      <li><Link to="/contact">Contact</Link></li>
-      <li><Link to="/partners">Partners</Link></li>
-    </ul>
-  </nav>
+{/* <nav className={styles.headerNav}>
+  <span className={styles.navItem}><Link to="/home">Home</Link></span>
+  <span className={styles.navItem}><Link to="/about-us">About Us</Link></span>
+  <span className={styles.navItem}><Link to="/contact">Contact</Link></span>
+  <span className={styles.navItem}><Link to="/partners">Partners</Link></span>
+</nav> */}
 
  
   </header>
@@ -576,8 +574,9 @@ const hasRegisterErrors = registerSubmitted && Object.keys(formErrors).length > 
           </div>
         )}
 
-      </div></div>
-              <footer className="footer">© 2025 Vectrolla. All rights reserved.</footer>
+      </div>
+</div>
+<footer className={styles.footer}>© 2025 Vectrolla. All rights reserved.</footer>
 
     </div>
     
