@@ -7,8 +7,7 @@ const PersonalInfo = ({ user }) => {
       <h2>👤 Personal Information</h2>
       <ul>
         <li><strong>Full Name:</strong> {user.fName} {user.lName}</li>
-                <li><strong>EMP ID :</strong> {user.id}</li>
-
+        <li><strong>EMP ID:</strong> {user.id}</li>
         <li><strong>Email:</strong> {user.email}</li>
         <li><strong>Mobile:</strong> {user.mobile}</li>
         <li><strong>Country:</strong> {user.country}</li>

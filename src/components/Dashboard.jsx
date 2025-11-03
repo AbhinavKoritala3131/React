@@ -7,6 +7,10 @@ import GlowingCards from './DashboardElements';
 import PersonalInfo from './PersonalInfo';
 import Projects from './Projects';
 import Timesheets from './Timesheets';
+import StatusReports from './adminOnly/StatusReports'
+import HrPayrollManager from './HrPayrollViewer';
+import AssignProjects from'./adminOnly/AssignProjects';
+import AuthorizeForm from './adminOnly/AdminUserForm';
 import '../styles/Dashboard.css';
 
 const Dashboard = () => {
@@ -153,7 +157,15 @@ const handleLogout = () => {
 };
 
   // UI Rendering
-  if (loading) return <div>Loading dashboard...</div>;
+if (loading) {
+  return (
+    <div className="loading-page">
+      <div className="spinner"></div>
+      <div className="loading-text">Loading Dashboard...</div>
+    </div>
+  );
+}
+
   if (!user) return <div>Unauthorized or user not found.</div>;
 
   return (
@@ -203,12 +215,29 @@ const handleLogout = () => {
         <button onClick={() => {setActiveComponent('home'); setMenuOpen(false);}}>🏠 Home</button>
         <button onClick={() => {setActiveComponent('timesheets');setMenuOpen(false);}}>📅 Timesheets</button>
         <button onClick={() => {setActiveComponent('projects');setMenuOpen(false);}}>📁 Projects</button>
+
         {role === 'ADMIN' && (
           <>
             <button onClick={() => {setActiveComponent('ManageTimesheets');setMenuOpen(false);}}>🗓️ Manage Timesheets</button>
-            <button onClick={() => {setActiveComponent('adminReports');setMenuOpen(false);}}>📊 Admin Reports</button>
+            <button onClick={() => {setActiveComponent('StatusReports');setMenuOpen(false);}}>📊 Admin Reports</button>
+                        <button onClick={() => {setActiveComponent('AssignProjects'); setMenuOpen(false);}}>🛠️ Assign Projects</button>
+                        <button onClick={() => {setActiveComponent('AuthorizeForm');setMenuOpen(false);}}>🛡️ Authorize Users</button>
+
           </>
         )}
+        {(role === 'HR' || role==='ADMIN') && (
+  <>
+    <button
+      onClick={() => {
+        setActiveComponent('HrPayroll');
+        setMenuOpen(false);
+      }}
+    >
+      🧾 Payroll 
+    </button>
+  </>
+)}
+
       </div>
 
       {/* Main Content */}
@@ -216,6 +245,13 @@ const handleLogout = () => {
       {activeComponent === 'projects' && <Projects userId={userId}/>}
       {activeComponent === 'timesheets' && <Timesheets userId={userId} />}
       {activeComponent === 'ManageTimesheets' && role === 'ADMIN' && <ManageTimesheets />}
+      {activeComponent === 'HrPayroll' && (role === 'HR' || role === 'ADMIN') && ( <div className="hr-payroll-container"><HrPayrollManager /></div>)}
+      {activeComponent === 'StatusReports' && role === 'ADMIN' && <StatusReports />}
+      {activeComponent === 'AssignProjects' && role === 'ADMIN' && <AssignProjects />}
+            {activeComponent === 'AuthorizeForm' && role === 'ADMIN' && <AuthorizeForm />}
+
+
+
 
       {activeComponent === 'home' && (
         <div className="home-dashboard">
