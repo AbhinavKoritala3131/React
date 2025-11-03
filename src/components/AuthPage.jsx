@@ -96,10 +96,10 @@ const [signinSubmitted, setSigninSubmitted] = useState(false);
   const validateRegisterForm = () => {
     const errors = {};
 
-    if (!formData.firstName.trim() || formData.firstName.trim().length < 2 ||  !/^[A-Za-z]+$/.test(formData.firstName.trim())) {
+    if (!formData.firstName.trim() || formData.firstName.trim().length < 2 ||  !/^[A-Za-z\s]+$/.test(formData.firstName.trim())) {
       errors.firstName = 'First name must be at least 2 letters and contain only letters';
     }
-    if (!formData.lastName.trim() || formData.lastName.trim().length < 2 ||  !/^[A-Za-z]+$/.test(formData.lastName.trim())) {
+    if (!formData.lastName.trim() || formData.lastName.trim().length < 2 ||  !/^[A-Za-z\s]+$/.test(formData.lastName.trim())) {
       errors.lastName = 'Last name must be at least 2 letters and contain only letters';
     }
     if (!formData.username.trim()) {
